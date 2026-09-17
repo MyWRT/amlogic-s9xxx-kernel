@@ -1,55 +1,44 @@
-# Kernel Description
+# MyWRT 6.18 Kernel Builds
 
-[English Instructions](README.md) | [中文说明](README.cn.md)
+[English](README.md) | [中文说明](README.cn.md)
 
-These kernels can be used with `Armbian`, `OpenWrt`, and `FnNAS` systems, such as the [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [fnnas](https://github.com/ophub/fnnas), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions), and [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) projects. They can be integrated during firmware compilation or installed into an existing system. Among them, [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), and [kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) are interchangeable mainline kernels. All of these kernels were natively compiled on an [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) system (within a [Docker](https://hub.docker.com/u/ophub) environment), for detailed usage instructions, see the [Kernel Use Instructions](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel).
+This repository builds the latest stable `6.18.x` ARM64 kernel for the MyWRT firmware pipeline. It is intentionally limited to one source series, one configuration, and one release channel.
 
-- The kernel files in the [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) section of the Releases are the `stable version`, with additional support options enabled based on user requirements.
-- The kernel files in the [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy) section of the Releases are the `stable version`, a series of kernels created and shared by `flippy`.
-- The kernel files in the [kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) section of the Releases are the `beta version`, which support adding custom third-party driver patches and custom build configurations.
-- The kernel files in the [kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) section of the Releases are a `dedicated version` for the `rk3588` series and are not interchangeable with other series.
-- The kernel files in the [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) section of the Releases are a `dedicated version` for the `rk3528/rk3566/rk3568` series and are not interchangeable with other series.
-- The [dev](https://github.com/ophub/kernel/releases/tag/dev) section in the Releases provides `cross-compilation toolchain` downloads required for kernel compilation.
-- The [tools](https://github.com/ophub/kernel/releases/tag/tools) section in the Releases provides `Android system` images for common TV boxes, which can be used to restore the Android system when running Armbian or OpenWrt.
+## Build Contract
 
+| Item | Value |
+| --- | --- |
+| Kernel source | [`MyWRT/linux-6.18.y`](https://github.com/MyWRT/linux-6.18.y), branch `main` |
+| Kernel series | `6.18.y`, automatically resolved to the latest `6.18.x` release |
+| Kernel configuration | [`kernel-config/release/stable/config-6.18`](kernel-config/release/stable/config-6.18) |
+| Kernel signature | `-mywrt` |
+| Package set | `all` — boot, DTBs, and modules |
+| Release tag | [`kernel_stable`](https://github.com/MyWRT/amlogic-s9xxx-kernel/releases/tag/kernel_stable) |
 
-## Kernel Compilation
+Kernel source changes belong in `MyWRT/linux-6.18.y`; the build workflow does not apply an additional patch layer.
 
-- For kernel compilation instructions, please refer to [compile-kernel](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel). For compiling kernels using GitHub Actions, refer to [.github/workflows](.github/workflows). You can customize the kernel by modifying the kernel configuration files in [kernel-config](kernel-config) and add custom kernel patches in the [kernel-patch](kernel-patch) directory.
+## Build the Kernel
 
-- You can adjust the kernel configuration as needed, such as adding drivers and patches. You can also compile a personalized signature kernel with special meaning, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day`, etc.
+Run **Compile mainline stable kernel** from the repository's Actions page. The workflow always resolves the latest `6.18.x` release and exposes only these operational choices:
 
-```yaml
-- name: Compile the kernel
-  uses: ophub/amlogic-s9xxx-armbian@main
-  with:
-    build_target: kernel
-    kernel_version: 6.1.y_6.12.y
-    kernel_auto: true
-    kernel_sign: -yourname
-```
+- remove the checked-out source after compilation;
+- select the compiler toolchain and Armbian build image;
+- optionally clear ccache.
 
-## Kernel Source Code
+The source owner, kernel series, configuration path, package set, and signature are fixed in [`.github/workflows/compile-mainline-stable-kernel.yml`](.github/workflows/compile-mainline-stable-kernel.yml).
 
-Special thanks to contributors such as unifreq for maintaining the kernel source code, where the ophub kernel source is copied from unifreq's repository.
+The workflow uses [`ophub/amlogic-s9xxx-armbian`](https://github.com/ophub/amlogic-s9xxx-armbian) as the compiler and packager. Successful builds update the `kernel_stable` Release with the complete artifacts consumed by `amlogic-s9xxx-openwrt`.
 
-| Kernel Tags   | Source Code Repository  | Applicable devices      |
-| ------------- | ----------------------- | ----------------------- |
-| [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)<br>[kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy)<br>[kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) | [unifreq/linux-5.10.y](https://github.com/unifreq/linux-5.10.y)<br>[unifreq/linux-5.15.y](https://github.com/unifreq/linux-5.15.y)<br>[unifreq/linux-6.1.y](https://github.com/unifreq/linux-6.1.y)<br>[unifreq/linux-6.6.y](https://github.com/unifreq/linux-6.6.y)<br>[unifreq/linux-6.12.y](https://github.com/unifreq/linux-6.12.y)<br>[unifreq/linux-6.18.y](https://github.com/unifreq/linux-6.18.y) | Amlogic<br>Allwinner<br>Rockchip |
-| [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)<br>[kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) | [ophub/linux-5.10.y](https://github.com/ophub/linux-5.10.y)<br>[ophub/linux-5.15.y](https://github.com/ophub/linux-5.15.y)<br>[ophub/linux-6.1.y](https://github.com/ophub/linux-6.1.y)<br>[ophub/linux-6.6.y](https://github.com/ophub/linux-6.6.y)<br>[ophub/linux-6.12.y](https://github.com/ophub/linux-6.12.y)<br>[ophub/linux-6.18.y](https://github.com/ophub/linux-6.18.y) | Amlogic<br>Allwinner<br>Rockchip |
-| [kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588)<br>[kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [unifreq/linux-5.10.y-rk35xx](https://github.com/unifreq/linux-5.10.y-rk35xx)<br>[unifreq/linux-6.1.y-rockchip](https://github.com/unifreq/linux-6.1.y-rockchip)<br>[ophub/linux-5.10.y-rk35xx](https://github.com/ophub/linux-5.10.y-rk35xx)<br>[ophub/linux-6.1.y-rockchip](https://github.com/ophub/linux-6.1.y-rockchip) | Rockchip |
+## Customize the Kernel
 
-## Links
+- Change kernel code, device trees, or in-tree drivers in [`MyWRT/linux-6.18.y`](https://github.com/MyWRT/linux-6.18.y).
+- Change built-in/module selections in [`config-6.18`](kernel-config/release/stable/config-6.18).
+- Keep the source repository on branch `main`; the workflow uses its commit hash for the ccache key.
 
-- [unifreq/kernel](https://github.com/unifreq)
-- [chewitt/linux](https://github.com/chewitt/linux)
-- [torvalds/linux](https://github.com/torvalds/linux)
-- [kernel.org](https://kernel.org)
-- [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian)
-- [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt)
-- [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions)
-- [fnnas](https://github.com/ophub/fnnas)
+## Upstream
+
+This repository is derived from [`ophub/kernel`](https://github.com/ophub/kernel). Kernel compilation and packaging are provided by [`ophub/amlogic-s9xxx-armbian`](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel).
 
 ## License
 
-The kernel © OPHUB is licensed under [GPL-2.0](https://github.com/ophub/kernel/blob/main/LICENSE)
+Licensed under [GPL-2.0](LICENSE).

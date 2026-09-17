@@ -1,31 +1,37 @@
-# Kernel Custom Configuration Guide
+# Kernel Configuration
 
-When performing cloud compilation using GitHub Actions, you can use the `kernel_config` parameter to specify a custom kernel configuration. Configuration files for each kernel version are named using the major version number (e.g., config-6.1). Refer to the settings in [compile-mainline-stable-kernel.yml](../.github/workflows/compile-mainline-stable-kernel.yml):
+This repository maintains one kernel configuration:
 
-```yaml
-- name: Compile the kernel
-  uses: ophub/amlogic-s9xxx-armbian@main
-  with:
-    build_target: kernel
-    kernel_version: 5.15.y_6.1.y
-    kernel_auto: true
-    kernel_config: kernel-config/release/stable
+```text
+kernel-config/release/stable/config-6.18
 ```
 
-If no custom configuration is required, this parameter can be omitted. The default kernel configuration file [compile-kernel/tools/config](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel/tools/config) will be used for compilation. For more details, please refer to the [Kernel Compilation Guide](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel).
-
-# 内核自定义配置说明
-
-在 GitHub Actions 云编译时，可以使用 `kernel_config` 参数指定自定义内核配置。各内核版本的配置文件（config-k.x）以主版本号命名（例如：config-6.1），使用方法可参考 [compile-mainline-stable-kernel.yml](../.github/workflows/compile-mainline-stable-kernel.yml) 中的设置：
+The stable workflow always builds `MyWRT/linux-6.18.y` with this configuration:
 
 ```yaml
-- name: Compile the kernel
-  uses: ophub/amlogic-s9xxx-armbian@main
-  with:
-    build_target: kernel
-    kernel_version: 5.15.y_6.1.y
-    kernel_auto: true
-    kernel_config: kernel-config/release/stable
+with:
+  kernel_source: MyWRT
+  kernel_version: 6.18.y
+  kernel_config: kernel-config/release/stable
 ```
 
-如果没有特殊需求，可以不指定自定义配置，编译时将采用默认内核配置文件 [compile-kernel/tools/config](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel/tools/config) 进行编译。更多详情请参考[内核编译说明](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel)文档。
+Edit `config-6.18` to change built-in features or modules. Source code, device-tree, and driver changes belong in [`MyWRT/linux-6.18.y`](https://github.com/MyWRT/linux-6.18.y), not in a build-time patch directory.
+
+# 内核配置
+
+本仓库只维护一份内核配置：
+
+```text
+kernel-config/release/stable/config-6.18
+```
+
+稳定版工作流始终使用该配置构建 `MyWRT/linux-6.18.y`：
+
+```yaml
+with:
+  kernel_source: MyWRT
+  kernel_version: 6.18.y
+  kernel_config: kernel-config/release/stable
+```
+
+修改 `config-6.18` 可以调整内建功能或模块。内核源码、设备树和驱动修改应直接提交到 [`MyWRT/linux-6.18.y`](https://github.com/MyWRT/linux-6.18.y)，而不是通过构建时补丁目录维护。

@@ -14,7 +14,7 @@ assignees: ''
  - System: [e.g. Armbian/OpenWrt]
 
 **Kernel Version | 内核版本**
- - Kernel Version: [e.g. 5.15.100]
+ - Kernel Version: [e.g. 6.18.12]
 
 **Describe the bug | 问题描述**
 All issues will only remain open for one week to prioritize resolving them.
